@@ -1,43 +1,59 @@
 #!/usr/bin/env ruby -wKU
 
-ssl_csr_exists      = lambda { FileTest.exists?("#{ `echo $HOME` }".strip + "/.ssl/sslasher.csr") }
-ssl_key_exists      = lambda { FileTest.exists?("#{ `echo $HOME` }".strip + "/.ssl/sslasher.key") }
-nginx_config_exists = lambda { FileTest.exists?("#{ `pwd` }".strip + "/config/sslasher.conf") }
+# ~/.ssl
+	home					= "#{ `echo $HOME` }".strip
+	ssl_csr_file 	= "#{ home }/.ssl/sslasher.csr"
+	ssl_key_file 	= "#{ home }/.ssl/sslasher.key"
 
-unless ssl_csr_exists && ssl_key_exists
+# Rails.root
+	pwd						= "#{ `pwd` }".strip
+	config_file  	= "#{ pwd }/config/sslasher.conf"
+	pid_file  		= "#{ pwd }/tmp/pids/nginx.pid"
+	ssl_conf			= "#{ pwd }/config/sslasher.conf"
+
+unless FileTest.exists?(ssl_csr_file) && FileTest.exists?(ssl_key_file)
 	puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-	puts "We need to generate your self signed ssl certificate."
-	puts "Execute the following command:"
+	puts "Before you can use Sslasher, we need to generate your self signed ssl certificate."
 	puts
-	puts "*you can even leave the questions blank*"
+	puts "Execute the following command in a new terminal window:"
 	puts
+	puts "mkdir -p ~/.ssl"
+	puts "cd ~/.ssl"
 	puts "openssl req -new -x509 -nodes -days 365 -keyout sslasher.key -out sslasher.csr"
 	puts
-	puts "When you are done you can launch sslasher again."
+	puts "Then come back here and execute sslasher again."
 	puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	exit 0
 end
 
-unless nginx_config_exists
+unless FileTest.exists?(config_file)
 	puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	puts "We need to generate a NGINX config file for you"
 	puts
 	puts "Execute the following command:"
 	puts
 	puts "rails generate sslasher <proxy_port>"
+	puts
+	puts "Then execute sslasher again."
 	puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	exit 0
 end
 
-puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-puts "We need to run NGINX with sudo access so it can bind to ports"
-puts "80 for HTTP and 443 for HTTPS. We'll proxy both ports to your Rails"
-puts "app running with webrick, mongrel, unicorn or whatever."
-puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-
-pwd      = "#{`pwd`}".strip
-ssl_conf = "#{pwd}/config/sslasher.conf"
-args     = ARGV.join(' ')
-command  = "sudo nginx -c #{ssl_conf} #{args}"
+if FileTest.exists?(pid_file)
+	puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+	puts "Quiting the server."
+	puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+	args     = ARGV.join(' ')
+	command  = "sudo nginx -c #{ssl_conf} -s stop #{args}"
+else
+	puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+	puts "We need to run NGINX with sudo access so it can bind to ports"
+	puts "80 for HTTP and 443 for HTTPS. We'll then proxy both of those"
+	puts "ports to your Rails app running with webrick, mongrel, unicorn"
+	puts "or whatever."
+	puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+	args     = ARGV.join(' ')
+	command  = "sudo nginx -c #{ssl_conf} #{args}"
+end
 
 `#{command}`

@@ -2,6 +2,8 @@ require "rubygems"
 require "rake/gempackagetask"
 require "rake/rdoctask"
 
+
+
 task :default => :package do
   puts "Don't forget to write some tests!"
 end
@@ -26,7 +28,7 @@ spec = Gem::Specification.new do |s|
   s.rdoc_options      = %w(--main README)
 
   # Add any extra files to include in the gem
-  s.files             = %w(NOTES.txt README ssl_magic.gemspec) + Dir.glob("{bin,lib/**/*}")
+  s.files             = %w(NOTES.txt README) + Dir.glob("{bin,lib/**/*}")
   s.executables       = FileList["bin/**"].map { |f| File.basename(f) }
   s.require_paths     = ["lib"]
 
@@ -43,7 +45,7 @@ end
 # be automatically building a gem for this project. If you're not
 # using GitHub, edit as appropriate.
 #
-# To publish your gem online, install the 'gemcutter' gem; Read more
+# To publish your gem online, install the 'gemcutter' gem; Read more 
 # about that here: http://gemcutter.org/pages/gem_docs
 Rake::GemPackageTask.new(spec) do |pkg|
   pkg.gem_spec = spec
