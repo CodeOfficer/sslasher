@@ -1,0 +1,104 @@
+user <%= "#{`id -un`}".strip %> <%= "#{`id -gn`}".strip %>;
+
+worker_processes 1;
+
+pid <%= Rails.root %>/tmp/pids/nginx.pid;
+error_log <%= Rails.root %>/log/nginx_error.log;
+
+events {
+	worker_connections 1024;
+	accept_mutex off; # "on" if worker_processes > 1
+	use kqueue; # enable for FreeBSD, OSX
+}
+
+http {
+	include /usr/local/etc/nginx/mime.types;
+	default_type application/octet-stream;
+  access_log <%= Rails.root %>/log/nginx_access.log combined;
+
+	# you generally want to serve static files with nginx since neither
+	# Unicorn nor Rainbows! is optimized for it at the moment
+	sendfile on;
+
+  # Set this to on if you have sendfile on
+  # It will prepend the HTTP response headers before
+  # calling sendfile()
+  tcp_nopush on;
+
+	keepalive_timeout 65;
+
+  upstream proxy_server {
+    # fail_timeout=0 means we always retry an upstream even if it failed
+    # to return a good HTTP response (in case the Unicorn master nukes a
+    # single worker for timing out).
+    server 127.0.0.1:<%= class_name %> fail_timeout=0;
+  }
+
+	# HTTP server
+	server {
+		listen			 80;
+		# server_name  ssl_magic.local;
+
+		root <%= Rails.root %>/current/public;
+
+		location / {
+			proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+			proxy_set_header Host $http_host;
+			proxy_redirect off;
+
+			# Try to serve static files from nginx, no point in making an
+			# *application* server like Unicorn/Rainbows! serve static files.
+			if (!-f $request_filename) {
+			  proxy_pass http://proxy_server;
+			  break;
+			}
+		}
+
+		# Rails error pages
+		error_page 500 502 503 504 /500.html;
+		location = /500.html {
+			root <%= Rails.root %>/current/public;
+		}
+	}
+
+	# HTTPS server
+	server {
+		listen       443;
+		# server_name  ssl_magic.local;
+
+		root <%= Rails.root %>/current/public;
+
+		ssl                  on;
+		ssl_certificate      <%= "#{`echo $HOME`}".strip %>/.ssl/ssl_magic.csr;
+		ssl_certificate_key  <%= "#{`echo $HOME`}".strip %>/.ssl/ssl_magic.key;
+
+		ssl_session_timeout  5m;
+
+		ssl_protocols  SSLv2 SSLv3 TLSv1;
+		ssl_ciphers  ALL:!ADH:!EXPORT56:RC4+RSA:+HIGH:+MEDIUM:+LOW:+SSLv2:+EXP;
+		ssl_prefer_server_ciphers   on;
+
+		location / {
+			proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+			proxy_set_header Host $http_host;
+			proxy_redirect off;
+
+			# enable this if and only if you use HTTPS, this helps Rack
+			# set the proper protocol for doing redirects:
+			proxy_set_header X-Forwarded-Proto https;
+
+			# Try to serve static files from nginx, no point in making an
+			# *application* server like Unicorn/Rainbows! serve static files.
+			if (!-f $request_filename) {
+			  proxy_pass http://proxy_server;
+			  break;
+			}
+		}
+		# Rails error pages
+		error_page 500 502 503 504 /500.html;
+		location = /500.html {
+			root <%= Rails.root %>/current/public;
+		}
+	}
+
+}
