@@ -10,8 +10,10 @@ Gem::Specification.new do |s|
   s.default_executable = %q{ssl_magic}
   s.email = %q{spam@codeofficer.com}
   s.executables = ["ssl_magic"]
-  s.files = ["bin", "lib/ssl_magic.rb", "bin/ssl_magic"]
+  s.extra_rdoc_files = ["README"]
+  s.files = ["NOTES.txt", "README", "ssl_magic.gemspec", "lib/generators/ssl_magic/ssl_magic_generator.rb", "lib/generators/ssl_magic/templates/ssl_magic.erb", "lib/generators/ssl_magic/USAGE", "lib/ssl_magic.rb", "bin/ssl_magic"]
   s.homepage = %q{http://yoursite.example.com}
+  s.rdoc_options = ["--main", "README"]
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.3.7}
   s.summary = %q{What this thing does}
