@@ -1,9 +1,8 @@
 #!/usr/bin/env ruby -wKU
 
-# look for our self signed certificates
-ssl_csr_exists = lambda { FileTest.exists?("#{ `echo $HOME` }".strip + "/.ssl/ssl_magic.csr") }
-ssl_key_exists = lambda { FileTest.exists?("#{ `echo $HOME` }".strip + "/.ssl/ssl_magic.key") }
-nginx_config_exists = lambda { FileTest.exists?("#{ `pwd` }".strip + "/config/ssl_magic.conf") }
+ssl_csr_exists      = lambda { FileTest.exists?("#{ `echo $HOME` }".strip + "/.ssl/sslasher.csr") }
+ssl_key_exists      = lambda { FileTest.exists?("#{ `echo $HOME` }".strip + "/.ssl/sslasher.key") }
+nginx_config_exists = lambda { FileTest.exists?("#{ `pwd` }".strip + "/config/sslasher.conf") }
 
 unless ssl_csr_exists && ssl_key_exists
 	puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
@@ -12,9 +11,9 @@ unless ssl_csr_exists && ssl_key_exists
 	puts
 	puts "*you can even leave the questions blank*"
 	puts
-	puts "openssl req -new -x509 -nodes -days 365 -keyout ssl_magic.key -out ssl_magic.csr"
+	puts "openssl req -new -x509 -nodes -days 365 -keyout sslasher.key -out sslasher.csr"
 	puts
-	puts "When you are done you can launch ssl_magic again."
+	puts "When you are done you can launch sslasher again."
 	puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	exit 0
 end
@@ -25,7 +24,7 @@ unless nginx_config_exists
 	puts
 	puts "Execute the following command:"
 	puts
-	puts "rails generate ssl_magic <proxy_port>"
+	puts "rails generate sslasher <proxy_port>"
 	puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	exit 0
 end
@@ -36,12 +35,9 @@ puts "80 for HTTP and 443 for HTTPS. We'll proxy both ports to your Rails"
 puts "app running with webrick, mongrel, unicorn or whatever."
 puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
-pwd = "#{`pwd`}".strip
-ssl_conf = "#{pwd}/config/ssl_magic.conf"
-args = ARGV.join(' ')
-command = "sudo nginx -c #{ssl_conf} #{args}"
-# `sudo nginx -c #{ssl_conf} #{ARGV.join(' ')}`
+pwd      = "#{`pwd`}".strip
+ssl_conf = "#{pwd}/config/sslasher.conf"
+args     = ARGV.join(' ')
+command  = "sudo nginx -c #{ssl_conf} #{args}"
 
 `#{command}`
-
-# puts "#{command}"

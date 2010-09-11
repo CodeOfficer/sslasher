@@ -37,8 +37,6 @@ http {
 	# HTTP server
 	server {
 		listen			 80;
-		# server_name  ssl_magic.local;
-
 		root <%= Rails.root %>/current/public;
 
 		location / {
@@ -53,7 +51,6 @@ http {
 			  break;
 			}
 		}
-
 		# Rails error pages
 		error_page 500 502 503 504 /500.html;
 		location = /500.html {
@@ -64,13 +61,11 @@ http {
 	# HTTPS server
 	server {
 		listen       443;
-		# server_name  ssl_magic.local;
-
 		root <%= Rails.root %>/current/public;
 
 		ssl                  on;
-		ssl_certificate      <%= "#{`echo $HOME`}".strip %>/.ssl/ssl_magic.csr;
-		ssl_certificate_key  <%= "#{`echo $HOME`}".strip %>/.ssl/ssl_magic.key;
+		ssl_certificate      <%= "#{`echo $HOME`}".strip %>/.ssl/sslasher.csr;
+		ssl_certificate_key  <%= "#{`echo $HOME`}".strip %>/.ssl/sslasher.key;
 
 		ssl_session_timeout  5m;
 

@@ -14,7 +14,7 @@ end
 spec = Gem::Specification.new do |s|
 
   # Change these as appropriate
-  s.name              = "ssl_magic"
+  s.name              = "sslasher"
   s.version           = "0.1.0"
   s.summary           = "What this thing does"
   s.author            = "Russell Jones"
