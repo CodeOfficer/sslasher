@@ -6,12 +6,12 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Russell Jones"]
-  s.date = %q{2010-09-11}
+  s.date = %q{2010-09-12}
   s.default_executable = %q{sslasher}
   s.email = %q{spam@codeofficer.com}
   s.executables = ["sslasher"]
   s.extra_rdoc_files = ["README"]
-  s.files = ["NOTES.txt", "README", "lib/generators/sslasher/sslasher_generator.rb", "lib/generators/sslasher/templates/sslasher.erb", "lib/generators/sslasher/USAGE", "lib/sslasher.rb", "bin/sslasher"]
+  s.files = ["README", "lib/sslasher/railtie.rb", "lib/sslasher.rb", "lib/tasks/sslasher.rake", "lib/templates/sslasher.conf.erb", "bin/sslasher"]
   s.homepage = %q{http://yoursite.example.com}
   s.rdoc_options = ["--main", "README"]
   s.require_paths = ["lib"]

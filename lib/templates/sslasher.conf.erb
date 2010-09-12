@@ -1,9 +1,9 @@
-user <%= "#{`id -un`}".strip %> <%= "#{`id -gn`}".strip %>;
+user <%= USER %> <%= GROUP %>;
 
 worker_processes 1;
 
-pid <%= Rails.root %>/tmp/pids/nginx.pid;
-error_log <%= Rails.root %>/log/nginx_error.log;
+pid <%= APP_ROOT %>/tmp/pids/nginx.pid;
+error_log <%= APP_ROOT %>/log/nginx_error.log;
 
 events {
 	worker_connections 1024;
@@ -14,7 +14,7 @@ events {
 http {
 	include /usr/local/etc/nginx/mime.types;
 	default_type application/octet-stream;
-  access_log <%= Rails.root %>/log/nginx_access.log combined;
+  access_log <%= APP_ROOT %>/log/nginx_access.log combined;
 
 	# you generally want to serve static files with nginx since neither
 	# Unicorn nor Rainbows! is optimized for it at the moment
@@ -31,7 +31,7 @@ http {
     # fail_timeout=0 means we always retry an upstream even if it failed
     # to return a good HTTP response (in case the Unicorn master nukes a
     # single worker for timing out).
-    server 127.0.0.1:<%= class_name %> fail_timeout=0;
+    server 127.0.0.1:<%= PROXY_PORT %> fail_timeout=0;
   }
 
 	# HTTP server
@@ -53,7 +53,7 @@ http {
 		# Rails error pages
 		error_page 500 502 503 504 /500.html;
 		location = /500.html {
-			root <%= Rails.root %>/current/public;
+			root <%= APP_ROOT %>/current/public;
 		}
 	}
 
@@ -62,8 +62,8 @@ http {
 		listen       443;
 
 		ssl                  on;
-		ssl_certificate      <%= "#{`echo $HOME`}".strip %>/.ssl/sslasher.csr;
-		ssl_certificate_key  <%= "#{`echo $HOME`}".strip %>/.ssl/sslasher.key;
+		ssl_certificate      <%= HOME_DIR %>/.ssl/sslasher.csr;
+		ssl_certificate_key  <%= HOME_DIR %>/.ssl/sslasher.key;
 
 		ssl_session_timeout  5m;
 
@@ -90,7 +90,7 @@ http {
 		# Rails error pages
 		error_page 500 502 503 504 /500.html;
 		location = /500.html {
-			root <%= Rails.root %>/current/public;
+			root <%= APP_ROOT %>/current/public;
 		}
 	}
 

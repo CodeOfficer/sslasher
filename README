@@ -1,0 +1,41 @@
+rvm use ruby-1.9.2-p0@codeofficer
+
+rails new ssl_app
+cd ssl_app
+
+rm public/index.html
+
+r g controller home index
+r g controller secret index
+
+add to application.html.erb
+-----------------------------------------
+	<ul>
+		<li><%= link_to "Home", home_index_path %></li>
+		<li><%= link_to "Secret", secret_index_path %></li>
+	</ul>
+
+add to routes.rb
+-----------------------------------------
+  root :to => "home#index"
+
+rails plugin install git://github.com/rails/ssl_requirement.git
+
+add to application controller
+-----------------------------------------
+	ssl_required :index
+
+add to secrets controller
+-----------------------------------------
+	ssl_required :index
+
+add to Gemfile
+-----------------------------------------
+gem install ssl_magic
+
+# gitignore config/ssl_magic.conf
+# execute wrapper command
+	- check for ~/.ssl/ssl_magic.*
+		- create them
+		- openssl req -new -x509 -nodes -days 365 -keyout ssl_magic.key -out ssl_magic.csr
+	- launch nginx with custom config

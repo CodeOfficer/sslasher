@@ -1,1 +1,3 @@
-require 'rails/generators'
+module Sslasher
+  require 'sslasher/railtie' if defined?(Rails)
+end

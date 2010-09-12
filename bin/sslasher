@@ -15,13 +15,13 @@ unless FileTest.exists?(ssl_csr_file) && FileTest.exists?(ssl_key_file)
 	puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	puts "Before you can use Sslasher, we need to generate your self signed ssl certificate."
 	puts
-	puts "Execute the following command in a NEW terminal window:"
+	puts "Execute the following command:"
 	puts
-	puts "mkdir -p ~/.ssl"
-	puts "cd ~/.ssl"
-	puts "openssl req -new -x509 -nodes -days 365 -keyout sslasher.key -out sslasher.csr"
+	puts "rake sslasher:create_cert"
 	puts
-	puts "Then come back here and execute sslasher again."
+	puts "This will create your self-signed cert in ~/.ssl/*"
+	puts
+	puts "Then execute sslasher again."
 	puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	exit 0
 end
@@ -32,7 +32,7 @@ unless FileTest.exists?(config_file)
 	puts
 	puts "Execute the following command:"
 	puts
-	puts "rails generate sslasher <proxy_port>"
+	puts "rake sslasher:create_config[port]"
 	puts
 	puts "Then execute sslasher again."
 	puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
@@ -40,20 +40,24 @@ unless FileTest.exists?(config_file)
 end
 
 if FileTest.exists?(pid_file)
-	puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-	puts "Quiting the server."
-	puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	args     = ARGV.join(' ')
 	command  = "sudo nginx -c #{ssl_conf} -s stop #{args}"
+	puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+	puts "Quiting the server."
+	puts
+	puts "Executing: #{command}"
+	puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 else
+	args     = ARGV.join(' ')
+	command  = "sudo nginx -c #{ssl_conf} #{args}"
 	puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	puts "We need to run NGINX with sudo access so it can bind to ports"
 	puts "80 for HTTP and 443 for HTTPS. We'll then proxy both of those"
 	puts "ports to your Rails app running with webrick, mongrel, unicorn"
 	puts "or whatever."
+	puts
+	puts "Executing: #{command}"
 	puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-	args     = ARGV.join(' ')
-	command  = "sudo nginx -c #{ssl_conf} #{args}"
 end
 
 `#{command}`
