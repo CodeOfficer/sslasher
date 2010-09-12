@@ -13,28 +13,20 @@
 
 unless FileTest.exists?(ssl_csr_file) && FileTest.exists?(ssl_key_file)
 	puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-	puts "Before you can use Sslasher, we need to generate your self signed ssl certificate."
-	puts
-	puts "Execute the following command:"
+	puts "Before you can use Sslasher, we need to generate your self signed ssl certificate. Execute the following command and then run sslasher again."
 	puts
 	puts "rake sslasher:create_certificate"
 	puts
 	puts "This will create your self-signed cert in ~/.ssl/*"
-	puts
-	puts "Then execute sslasher again."
 	puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	exit 0
 end
 
 unless FileTest.exists?(config_file)
 	puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-	puts "We need to generate a NGINX config file for you"
-	puts
-	puts "Execute the following command:"
+	puts "We need to generate a NGINX config file for you. Execute the following command and then run sslasher again."
 	puts
 	puts "rake sslasher:create_config[port]"
-	puts
-	puts "Then execute sslasher again."
 	puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	exit 0
 end
@@ -43,9 +35,9 @@ if FileTest.exists?(pid_file)
 	args     = ARGV.join(' ')
 	command  = "sudo nginx -c #{ssl_conf} -s stop #{args}"
 	puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-	puts "Quiting the server."
+	puts "Quiting the server with:"
 	puts
-	puts "Executing: #{command}"
+	puts "#{command}"
 	puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 else
 	args     = ARGV.join(' ')
@@ -56,7 +48,9 @@ else
 	puts "ports to your Rails app running with webrick, mongrel, unicorn"
 	puts "or whatever."
 	puts
-	puts "Executing: #{command}"
+	puts "Starting the server with:"
+	puts
+	puts "#{command}"
 	puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 end
 

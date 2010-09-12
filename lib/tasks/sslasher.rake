@@ -5,11 +5,13 @@ namespace :sslasher do
 
 	desc 'Create a self-signed certificate in ~/.ssl'
 	task :create_certificate do
+		puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 		mkdir_p "#{HOME_DIR}/.ssl"
 		cd "#{HOME_DIR}/.ssl"
 		rm Dir.glob('sslasher.*')
 		sh "openssl req -new -x509 -nodes -days 365 -keyout sslasher.key -out sslasher.csr"
 		cd  "#{APP_ROOT}"
+		puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	end
 
 	desc 'Create a sslasher.conf in Rails.root/config for Nginx'
