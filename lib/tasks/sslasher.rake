@@ -4,7 +4,7 @@ HOME_DIR = "#{ `echo $HOME` }".strip
 namespace :sslasher do
 
 	desc 'Create a self-signed certificate in ~/.ssl'
-	task :create_cert do
+	task :create_certificate do
 		mkdir_p "#{HOME_DIR}/.ssl"
 		cd "#{HOME_DIR}/.ssl"
 		rm Dir.glob('sslasher.*')

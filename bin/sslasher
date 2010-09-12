@@ -17,7 +17,7 @@ unless FileTest.exists?(ssl_csr_file) && FileTest.exists?(ssl_key_file)
 	puts
 	puts "Execute the following command:"
 	puts
-	puts "rake sslasher:create_cert"
+	puts "rake sslasher:create_certificate"
 	puts
 	puts "This will create your self-signed cert in ~/.ssl/*"
 	puts
