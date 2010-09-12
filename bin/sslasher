@@ -15,7 +15,7 @@ unless FileTest.exists?(ssl_csr_file) && FileTest.exists?(ssl_key_file)
 	puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	puts "Before you can use Sslasher, we need to generate your self signed ssl certificate."
 	puts
-	puts "Execute the following command in a new terminal window:"
+	puts "Execute the following command in a NEW terminal window:"
 	puts
 	puts "mkdir -p ~/.ssl"
 	puts "cd ~/.ssl"
