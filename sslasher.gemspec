@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.email = %q{spam@codeofficer.com}
   s.executables = ["sslasher"]
   s.extra_rdoc_files = ["README"]
-  s.files = ["README", "bin", "lib/certificate", "lib/certificate/sslasher.csr", "lib/certificate/sslasher.key", "lib/sslasher.rb", "lib/templates", "lib/templates/sslasher.conf.erb", "bin/sslasher"]
+  s.files = ["README", "lib/certificate/sslasher.csr", "lib/certificate/sslasher.key", "lib/sslasher.rb", "lib/templates/sslasher.conf.erb", "bin/sslasher"]
   s.homepage = %q{http://yoursite.example.com}
   s.rdoc_options = ["--main", "README"]
   s.require_paths = ["lib"]
