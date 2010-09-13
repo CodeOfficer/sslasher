@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby -wKU
 
-# require "fileutils"
+require "fileutils"
+require "erb"
 
 	HOME_DIR			= "#{ `echo $HOME` }".strip
 	SSL_DIR				= "#{ HOME_DIR }/.ssl"
