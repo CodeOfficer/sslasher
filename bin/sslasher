@@ -36,9 +36,9 @@ puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
 	else
 		puts "Which port would you like NGINX to proxy to?"
-		$stdout.write "->"
+		$stdout.write "[3000]: "
 		asked_port = gets
-		PROXY_PORT = asked_port.empty? ? '3000' : asked_port
+		PROXY_PORT = asked_port.strip.empty? ? '3000' : asked_port
 		puts
 
 		USER = "#{`id -un`}".strip
