@@ -1,57 +1,63 @@
 #!/usr/bin/env ruby -wKU
 
-# ~/.ssl
-	home					= "#{ `echo $HOME` }".strip
-	ssl_csr_file 	= "#{ home }/.ssl/sslasher.csr"
-	ssl_key_file 	= "#{ home }/.ssl/sslasher.key"
+# require "fileutils"
 
-# Rails.root
-	pwd						= "#{ `pwd` }".strip
-	config_file  	= "#{ pwd }/config/sslasher.conf"
-	pid_file  		= "#{ pwd }/tmp/pids/nginx.pid"
-	ssl_conf			= "#{ pwd }/config/sslasher.conf"
+	HOME_DIR			= "#{ `echo $HOME` }".strip
+	SSL_DIR				= "#{ HOME_DIR }/.ssl"
+	HOME_CSR_FILE	= "#{ HOME_DIR }/.ssl/sslasher.csr"
+	HOME_KEY_FILE	= "#{ HOME_DIR }/.ssl/sslasher.key"
 
-unless FileTest.exists?(ssl_csr_file) && FileTest.exists?(ssl_key_file)
-	puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-	puts "Before you can use Sslasher, we need to generate your self signed ssl certificate. Execute the following command and then run sslasher again."
-	puts
-	puts "rake sslasher:create_certificate"
-	puts
-	puts "This will create your self-signed cert in ~/.ssl/*"
-	puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-	exit 0
+	GEM_DIR				= File.expand_path("../..", __FILE__)
+	GEM_CONF_FILE	= "#{ GEM_DIR }/lib/templates/sslasher.conf.erb"
+	GEM_CSR_FILE 	= "#{ GEM_DIR }/lib/certificate/sslasher.csr"
+	GEM_KEY_FILE 	= "#{ GEM_DIR }/lib/certificate/sslasher.key"
+
+	RAILS_ROOT		= "#{ `pwd` }".strip
+	CONFIG_FILE  	= "/tmp/sslasher.conf"
+	PID_FILE  		= "#{ RAILS_ROOT }/tmp/pids/nginx.pid"
+
+unless FileTest.exists?(HOME_CSR_FILE) && FileTest.exists?(HOME_KEY_FILE)
+	FileUtils.mkdir_p SSL_DIR
+	FileUtils.copy(GEM_CSR_FILE, HOME_CSR_FILE)
+	FileUtils.copy(GEM_KEY_FILE, HOME_KEY_FILE)
 end
 
-unless FileTest.exists?(config_file)
-	puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-	puts "We need to generate a NGINX config file for you. Execute the following command and then run sslasher again."
-	puts
-	puts "rake sslasher:create_config[port]"
-	puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-	exit 0
-end
 
-if FileTest.exists?(pid_file)
-	args     = ARGV.join(' ')
-	command  = "sudo nginx -c #{ssl_conf} -s stop #{args}"
-	puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-	puts "Quiting the server with:"
-	puts
-	puts "#{command}"
-	puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-else
-	args     = ARGV.join(' ')
-	command  = "sudo nginx -c #{ssl_conf} #{args}"
-	puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-	puts "We need to run NGINX with sudo access so it can bind to ports"
-	puts "80 for HTTP and 443 for HTTPS. We'll then proxy both of those"
-	puts "ports to your Rails app running with webrick, mongrel, unicorn"
-	puts "or whatever."
-	puts
-	puts "Starting the server with:"
-	puts
-	puts "#{command}"
-	puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-end
+args = ARGV.join(' ')
+command  = "sudo nginx -c #{CONFIG_FILE} #{args}"
+
+puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+	if FileTest.exists?(PID_FILE)
+		command  = "#{command} -s stop"
+		puts "Now quiting the server with:"
+		puts
+		puts "#{command}"
+
+	else
+		puts "Which port would you like NGINX to proxy to?"
+		$stdout.write "->"
+		asked_port = gets
+		PROXY_PORT = asked_port.empty? ? '3000' : asked_port
+		puts
+
+		USER = "#{`id -un`}".strip
+		GROUP = "#{`id -gn`}".strip
+		CONFIG = "#{ `nginx -V 2>&1` }".strip
+		NGINX_CONFIG_DIR = /--conf-path=(\S*)\/nginx.conf/.match(CONFIG)[1] || "/usr/local/etc/nginx"
+		NGINX_MIME_FILE = "#{NGINX_CONFIG_DIR}/mime.types"
+
+		file_out = File.open(CONFIG_FILE, "w") do |f|
+			f.puts ERB.new(File.read(GEM_CONF_FILE)).result(binding)
+		end
+
+		puts "We need to give NGINX sudo access so it can bind to ports"
+		puts "80 for HTTP and 443 for HTTPS. We'll then proxy both of those"
+		puts "ports to your app server. Don't worry, it won't run as root."
+		puts
+		puts "Now starting the server with:"
+		puts
+		puts "#{command}"
+	end
+puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
 `#{command}`

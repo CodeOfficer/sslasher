@@ -19,6 +19,8 @@ namespace :sslasher do
 		PROXY_PORT = args.port || 3000
 		USER = "#{`id -un`}".strip
 		GROUP = "#{`id -gn`}".strip
+		CONFIG = "#{ `nginx -V 2>&1` }".strip
+		MIME_TYPES = /--conf-path=(\S*)\/nginx.conf/.match(CONFIG)[1] || "/usr/local/etc/nginx/mime.types"
 		file_in = File.read(File.expand_path("../../templates", __FILE__) + "/sslasher.conf.erb")
 		file_out = File.open(APP_ROOT + "/config/sslasher.conf", "w") do |f|
 			f.puts ERB.new(file_in).result(binding)

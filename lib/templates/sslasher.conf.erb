@@ -2,8 +2,8 @@ user <%= USER %> <%= GROUP %>;
 
 worker_processes 1;
 
-pid <%= APP_ROOT %>/tmp/pids/nginx.pid;
-error_log <%= APP_ROOT %>/log/nginx_error.log;
+pid <%= RAILS_ROOT %>/tmp/pids/nginx.pid;
+error_log <%= RAILS_ROOT %>/log/nginx_error.log;
 
 events {
 	worker_connections 1024;
@@ -12,9 +12,9 @@ events {
 }
 
 http {
-	include /usr/local/etc/nginx/mime.types;
+	include <%= NGINX_MIME_FILE %>;
 	default_type application/octet-stream;
-  access_log <%= APP_ROOT %>/log/nginx_access.log combined;
+  access_log <%= RAILS_ROOT %>/log/nginx_access.log combined;
 
 	# you generally want to serve static files with nginx since neither
 	# Unicorn nor Rainbows! is optimized for it at the moment
@@ -53,7 +53,7 @@ http {
 		# Rails error pages
 		error_page 500 502 503 504 /500.html;
 		location = /500.html {
-			root <%= APP_ROOT %>/current/public;
+			root <%= RAILS_ROOT %>/current/public;
 		}
 	}
 
@@ -90,7 +90,7 @@ http {
 		# Rails error pages
 		error_page 500 502 503 504 /500.html;
 		location = /500.html {
-			root <%= APP_ROOT %>/current/public;
+			root <%= RAILS_ROOT %>/current/public;
 		}
 	}
 
