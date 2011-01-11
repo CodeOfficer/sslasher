@@ -3,24 +3,24 @@
 require "fileutils"
 require "erb"
 
-	HOME_DIR			= "#{ `echo $HOME` }".strip
-	SSL_DIR				= "#{ HOME_DIR }/.ssl"
-	HOME_CSR_FILE	= "#{ HOME_DIR }/.ssl/sslasher.csr"
-	HOME_KEY_FILE	= "#{ HOME_DIR }/.ssl/sslasher.key"
+	USR_HOME           = "#{ `echo $HOME` }".strip
+	USR_SSL_CSR        = "#{ USR_HOME }/.ssl/sslasher.csr"
+	USR_SSL_KEY        = "#{ USR_HOME }/.ssl/sslasher.key"
 
-	GEM_DIR				= File.expand_path("../..", __FILE__)
-	GEM_CONF_FILE	= "#{ GEM_DIR }/lib/templates/sslasher.conf.erb"
-	GEM_CSR_FILE 	= "#{ GEM_DIR }/lib/certificate/sslasher.csr"
-	GEM_KEY_FILE 	= "#{ GEM_DIR }/lib/certificate/sslasher.key"
+	GEM_DIR            = File.expand_path("../..", __FILE__)
+	GEM_NGINX_CONFIG   = "#{ GEM_DIR }/templates/sslasher.conf.erb"
+	GEM_SSL_CSR        = "#{ GEM_DIR }/certificate/sslasher.csr"
+	GEM_SSL_KEY        = "#{ GEM_DIR }/certificate/sslasher.key"
 
-	RAILS_ROOT		= "#{ `pwd` }".strip
-	CONFIG_FILE  	= "/tmp/sslasher.conf"
-	PID_FILE  		= "#{ RAILS_ROOT }/tmp/pids/nginx.pid"
+	APP_ROOT           = "#{ `pwd` }".strip
+	PID_FILE           = "#{ APP_ROOT }/tmp/pids/nginx.pid"
 
-unless FileTest.exists?(HOME_CSR_FILE) && FileTest.exists?(HOME_KEY_FILE)
-	FileUtils.mkdir_p SSL_DIR
-	FileUtils.copy(GEM_CSR_FILE, HOME_CSR_FILE)
-	FileUtils.copy(GEM_KEY_FILE, HOME_KEY_FILE)
+	CONFIG_FILE        = "/tmp/sslasher.conf"
+
+unless FileTest.exists?(USR_SSL_CSR) && FileTest.exists?(USR_SSL_KEY)
+	FileUtils.mkdir_p "#{ USR_HOME }/.ssl"
+	FileUtils.copy(GEM_SSL_CSR, USR_SSL_CSR)
+	FileUtils.copy(GEM_SSL_KEY, USR_SSL_KEY)
 end
 
 
@@ -48,7 +48,7 @@ puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 		NGINX_MIME_FILE = "#{NGINX_CONFIG_DIR}/mime.types"
 
 		file_out = File.open(CONFIG_FILE, "w") do |f|
-			f.puts ERB.new(File.read(GEM_CONF_FILE)).result(binding)
+			f.puts ERB.new(File.read(GEM_NGINX_CONFIG)).result(binding)
 		end
 
 		puts "We need to give NGINX sudo access so it can bind to ports"
